@@ -1,0 +1,21 @@
+<mat-toolbar class="app-toolbar" color="primary">
+    <button (click)="sidenav.toggle()" mat-icon-button class="example-icon">
+        <mat-icon>menu</mat-icon>
+      </button> 
+    <span>Employee Book</span>
+    <span class="toolbar-spacer"></span>
+    <img
+        [matMenuTriggerFor]="menu"
+        src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png" 
+        width="45" 
+        height="45"
+        style="border-radius: 50%; cursor: pointer;">
+
+    <mat-menu #menu="matMenu">
+        <span mat-menu-item disabled>EB - Admin 1</span>
+        <button (click)="onLogout()" mat-menu-item>
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+        </button>
+    </mat-menu>
+</mat-toolbar>

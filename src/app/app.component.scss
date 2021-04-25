@@ -1,0 +1,26 @@
+.app-view {
+    width: 100vw;
+    height: 100vh;
+}
+
+.app-toolbar {
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.sidenav-container {
+    background-color: #eeebe2; 
+    height: 100%;
+}
+
+.sidenav {
+    width: 275px;
+    background-color: #455a64;
+    color: #ffffff;
+}
+
+.toolbar-spacer {
+    flex: 1 1 auto;
+}

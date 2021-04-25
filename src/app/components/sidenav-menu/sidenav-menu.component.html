@@ -1,0 +1,16 @@
+<mat-toolbar color="primary">
+    <mat-toolbar-row>
+      <h2>Dashboard</h2>
+    </mat-toolbar-row>
+</mat-toolbar>
+<mat-nav-list style="color: #fff;">
+    <a 
+        mat-list-item
+        (click)="sidenav.close()"
+        style="color: #fff;"
+        *ngFor="let menu of menus; let i=index"
+        [routerLink]="[menu.route]">
+        <mat-icon matListIcon>{{ menu.icon }}</mat-icon>
+        {{ menu.title }}
+    </a>
+</mat-nav-list>

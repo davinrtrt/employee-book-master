@@ -1,0 +1,44 @@
+
+/* You can add global styles to this file, and also import other style files */
+@import "~bootstrap/dist/css/bootstrap.css";
+
+html, body { 
+    height: 100%; 
+    line-height: 1.15;
+    font-size: 14px;
+}
+
+body { 
+    margin: 0; 
+    font-family: Roboto, "Helvetica Neue", sans-serif; 
+}
+
+.text-warning {
+    color: #f44336!important;
+}
+
+.form-content {
+    background: #fff; 
+    padding: 1.5rem;
+    border: 1px solid #DDDDE0;
+    border-radius: 5px;
+}
+
+$primary-color: #455a64;
+
+.label-text {
+    color: $primary-color;
+    font-weight: bold;
+}
+
+.snackbar-container {
+    color: unset!important;
+    background-color: unset!important;
+    box-shadow: unset!important;
+}
+
+::ng-deep .mat-snack-bar-container {
+    color: unset!important;
+    background-color: unset!important;
+    box-shadow: unset!important;
+}

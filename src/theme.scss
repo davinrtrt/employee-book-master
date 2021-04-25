@@ -1,0 +1,12 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
+$ems-primary: #2e4d50;
+
+$primary: mat-palette($mat-blue-gray, 700);
+$accent: mat-palette($mat-amber, 900);
+$warning: mat-palette($mat-red);
+
+$custom-theme: mat-light-theme($primary, $accent, $warning);
+
+@include angular-material-theme($custom-theme);

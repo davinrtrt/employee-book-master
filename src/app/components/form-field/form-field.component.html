@@ -1,0 +1,74 @@
+<mat-form-field *ngIf="type !== 'datepicker'" appearance="legacy" 
+    class="input-field-full">
+    <mat-label>
+        {{ label }}
+        <span *ngIf="isRequired" class="text-warning">*</span>
+    </mat-label>
+    <ng-container [ngSwitch]="type">
+        <ng-container *ngSwitchCase="'text'">
+            <input matInput [formControl]="formControl" type="text">
+        </ng-container>
+        <ng-container *ngSwitchCase="'textarea'">
+            <textarea matInput [formControl]="formControl"></textarea>
+        </ng-container>
+        <ng-container *ngSwitchCase="'number'">
+            <input matInput [formControl]="formControl" type="number">
+        </ng-container>
+        <!-- <ng-container *ngSwitchCase="'datepicker'">
+            <input 
+                matInput 
+                [max]="maxDate"
+                [matDatepicker]="picker"
+                placeholder="Choose a date" 
+                [formControl]="formControl">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </ng-container> -->
+        <ng-container *ngSwitchCase="'autocomplete'">
+            <input type="text"
+                placeholder="Pick one"
+                matInput
+                [formControl]="formControl"
+                [matAutocomplete]="auto"
+                #input
+                (keyup)="valueChanged(input.value)">
+            <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                {{ option }}
+            </mat-option>
+            </mat-autocomplete>
+        </ng-container>
+        <ng-container *ngSwitchCase="'select'">
+            <mat-select [formControl]="formControl">
+                <mat-option 
+                    *ngFor="let option of options"
+                    [value]="option">
+                        {{ option }}
+                </mat-option>
+            </mat-select>
+        </ng-container>
+    </ng-container>
+</mat-form-field>
+<mat-form-field *ngIf="type === 'datepicker'">
+    <mat-label>
+        {{ label }}
+        <span *ngIf="isRequired" class="text-warning">*</span>
+    </mat-label>
+    <input 
+        matInput 
+        [max]="maxDate"
+        [matDatepicker]="picker"
+        placeholder="Choose a date" 
+        [formControl]="formControl">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+</mat-form-field>
+<mat-error *ngIf="formControl.errors?.pattern">
+    Invalid format.
+</mat-error>
+<mat-error *ngIf="isFieldInvalid()">
+    This field must be filled.
+</mat-error>
+<mat-error *ngIf="formControl.errors?.matDatepickerMax">
+    {{ label }} should be inferior.
+</mat-error>

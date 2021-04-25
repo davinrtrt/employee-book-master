@@ -1,0 +1,53 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Employees</h3>
+            <div class="w-100 d-flex align-items-center justify-content-between">
+                <div class="w-100">
+                    <mat-form-field class="w-75">
+                        <mat-label>Search</mat-label>
+                        <input 
+                            matInput 
+                            type="text"
+                            [(ngModel)]="searchEmployeeName" 
+                            (keyup)="onSearch()"
+                            placeholder="Search Fulltime employee based on first name or last name. Ex: Georas, Hodge" 
+                            #input>
+                    </mat-form-field>
+                </div>
+                <div>
+                    <button (click)="onAddEmployee()" mat-flat-button color="primary">Add Employee</button>
+                </div>
+            </div>
+        
+            <div class="table-responsive table-content" style="width: 100%;">
+                <table mat-table matSort [dataSource]="dataSource" class="w-100">
+                    <ng-container *ngFor="let columnName of tableColumns" [matColumnDef]="columnName">
+                        <th mat-header-cell *matHeaderCellDef 
+                            [mat-sort-header]="columnName !== 'actions' ? columnName : null" 
+                            [disabled]="columnName === 'actions' ? true : false">{{ columnName }}</th>
+                        <td mat-cell *matCellDef="let employee; let i=index"> 
+                            <ng-container *ngIf="columnName !== 'actions'">
+                                {{ (employee[columnName] | generalPipe: columnName) }}
+                            </ng-container>
+                            <ng-container *ngIf="columnName === 'actions'">
+                                <button title="View" (click)="onSelectEmployee(employee.username)" mat-icon-button>
+                                    <mat-icon style="color: #c9c9bd">info</mat-icon> 
+                                </button>
+                                <button title="Edit" (click)="onEditEmployee(employee.username)" mat-icon-button>
+                                    <mat-icon style="color: #c9c9bd">edit</mat-icon> 
+                                </button>
+                                <button title="Delete" (click)="onDeleteEmployee(employee.username)" mat-icon-button>
+                                    <mat-icon style="color: #c9c9bd">delete</mat-icon>
+                                </button>
+                            </ng-container>
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="tableColumns"></tr>
+                    <tr mat-row *matRowDef="let employee; columns: tableColumns"></tr> 
+                </table>
+                <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

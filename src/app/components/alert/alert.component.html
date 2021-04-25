@@ -1,0 +1,5 @@
+<div class="alert" role="alert"
+    [class.alert-danger]="data.action === ACTION.DELETE"
+    [class.alert-warning]="data.action === ACTION.EDIT">
+    {{ data.message }}
+</div>
