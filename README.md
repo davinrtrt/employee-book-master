@@ -44,5 +44,3 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 ## Author
 
 * **Davin Ongkadinata**
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
