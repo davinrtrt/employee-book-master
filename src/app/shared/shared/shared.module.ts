@@ -11,6 +11,8 @@ import { EmployeeService } from '../../services/employee.service';
 import { SnackbarService } from '../../services/snackbar.service';
 import { AuthGuard } from '../../services/auth.guard';
 import { AuthService } from '../../services/auth.service';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpErrorInterceptor } from '../../interceptors/interceptor';
 registerLocaleData(localeId);
 
 @NgModule({
@@ -25,6 +27,7 @@ registerLocaleData(localeId);
   ],
   imports: [
     CommonModule,
+    HttpClientModule,
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
@@ -32,6 +35,7 @@ registerLocaleData(localeId);
   ],
   exports: [
     CommonModule,
+    HttpClientModule,
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
@@ -44,7 +48,9 @@ registerLocaleData(localeId);
     AuthService,
     EmployeeService,
     SnackbarService,
-    DecimalPipe
+    DecimalPipe,
+
+    {provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true}
   ]
 })
 export class SharedModule {}

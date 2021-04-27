@@ -6,25 +6,14 @@ This is a test mini project to demonstrate using Angular framework.
 
 These instructions will get you a copy of the project up and running on your development server.
 
-## Login Credentials
-
-Username: eb_admin1
-Password: admin1
-
 ### Prerequisites
 
-Make sure you have Node.JS and Angular CLI installed in your device.
+Make sure you have Node.JS installed in your device.
 
 ### Installing
 
-Create an angular project by using the following command:
-```
-ng new {{ yourProjectName }}
-```
+Install the npm packages described in the package.json and verify it works:
 
-Clone this GIT or copy the following files into the project directory.
-
-Install the `npm` packages described in the package.json and verify it works:
 ```
 npm install
 ```
@@ -44,3 +33,5 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 ## Author
 
 * **Davin Ongkadinata**
+
+See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.

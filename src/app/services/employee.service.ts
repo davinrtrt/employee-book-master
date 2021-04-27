@@ -1,57 +1,78 @@
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from "@angular/core";
-import { ACTION, KEY_EMPLOYEE_DATA, KEY_SEARCH_EMPLOYEE } from '../models/app.constraint';
+import { Observable, of } from 'rxjs';
+import { throwError } from 'rxjs/internal/observable/throwError';
+import { catchError, retry } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 import { Employee } from '../models/app.model';
-import { SnackbarService } from './snackbar.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class EmployeeService {
 
-    private employeeData: Employee[] = []
+    private localUrl: string = environment.url;
+    private header: HttpHeaders = new HttpHeaders({
+        'Content-Type': 'application/json'
+    })
 
-    constructor(private snackBarService: SnackbarService){
-        this.employeeData = JSON.parse(localStorage.getItem(KEY_EMPLOYEE_DATA))
+    constructor(private http: HttpClient){
     }
 
-    getEmployees(){
-        this.employeeData = JSON.parse(localStorage.getItem(KEY_EMPLOYEE_DATA))
-        return this.employeeData
+    getEmployees(): Observable<Employee[]>{
+        console.log(this.localUrl + "/employees")
+        return this.http.get<Employee[]>(this.localUrl + "/employees")
+            .pipe(
+                retry(1),
+                catchError(this.handleError)
+            )
     }
 
-    getEmployeeByUsername(username: string){
-        return this.employeeData.find(x => x.username === username)
+    getEmployeeByUsername(username: string): Observable<Employee>{
+        return this.http.get<Employee>(this.localUrl + "/employees/" + username)
+            .pipe(
+                retry(1),
+                catchError(this.handleError)
+            )
     }
 
-    storeAllEmployees(employees: Employee[]){
-        localStorage.setItem(KEY_EMPLOYEE_DATA, JSON.stringify(employees))
-        console.log(JSON.parse(localStorage.getItem(KEY_EMPLOYEE_DATA)))
+    addEmployee(employee: Employee): Observable<Employee>{
+        // this.employeeData.push(employee)
+        // this.storeAllEmployees(this.employeeData)
+        return this.http.post<Employee>(this.localUrl + "/employees", employee, {headers: this.header})
+            .pipe(
+                retry(1),
+                catchError(this.handleError)
+            )
     }
 
-    addEmployee(employee: Employee){
-        this.employeeData.push(employee)
-        this.storeAllEmployees(this.employeeData)
+    updateEmployee(username: string, employee: Employee): Observable<Employee>{
+        return this.http.put<Employee>(this.localUrl + "/employees/" + username, employee, {headers: this.header})
+            .pipe(
+                retry(1),
+                catchError(this.handleError)
+            )
     }
 
-    updateEmployee(i: number, employee: Employee){
-        // this.getEmployees().map(emp => {
-        //     if(emp.username === employee.username){
-        //         emp = employee
-        //     }
-        // })
-        if(i !== -1){
-            this.employeeData[i] = employee
-            this.storeAllEmployees(this.employeeData)
-            this.snackBarService.openFromComponent(this.employeeData[i], ACTION.EDIT)
+    deleteEmployee(username: string){
+        return this.http.delete<Employee>(this.localUrl + "/employees/" + username, {headers: this.header})
+            .pipe(
+                retry(1),
+                catchError(this.handleError)
+            )
+    }
+
+    private handleError(error: HttpErrorResponse) {
+        let msg = '';
+        if(error.error instanceof ErrorEvent) {
+          // client side error
+          msg = error.error.message;
+        } else {
+          // server side error
+          msg = `Error Code: ${error.status}\nMessage: ${error.message}`;
         }
+        // console.log(msg);
+        return throwError(msg);
     }
-
-    deleteEmployee(i: number){
-        if(i !== -1){
-            this.snackBarService.openFromComponent(this.employeeData[i], ACTION.DELETE)
-
-            this.employeeData.splice(i, 1)
-            this.storeAllEmployees(this.employeeData)
-        }
-    }
+      
 }

@@ -21,7 +21,10 @@ export class FormFieldComponent implements OnInit {
   @Input()
   options: string[]
   @Input()
-  value: any = null
+  isEdittable: boolean
+  @Input()
+  value: any
+
   @Output()
   returnFormControl: EventEmitter<FormControl> = new EventEmitter<FormControl>()
 
@@ -29,17 +32,14 @@ export class FormFieldComponent implements OnInit {
   filteredOptions: any
   maxDate: Date = new Date()
 
-  constructor() { 
-  }
+  constructor() {}
 
   ngOnInit(): void {
     // console.log(this.value)
-
     if(this.uid === "STATUS"){
       this.formControl = new FormControl(this.value ? this.value : this.options[0], Validators.required)
     } else if(this.uid === "GROUP"){
       this.formControl = new FormControl(this.value ? this.value : this.options[0], Validators.required)
-      console.log(this.options)
       this.filteredOptions = this.formControl.valueChanges
         .pipe(
           startWith(''),
@@ -53,7 +53,7 @@ export class FormFieldComponent implements OnInit {
     } else {
       this.formControl = new FormControl(this.value ? this.value : '', Validators.required)
     }
-     
+      
     this.returnFormControl.emit(this.formControl)
   }
 

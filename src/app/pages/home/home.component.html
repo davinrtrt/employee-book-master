@@ -46,7 +46,7 @@
                     <tr mat-header-row *matHeaderRowDef="tableColumns"></tr>
                     <tr mat-row *matRowDef="let employee; columns: tableColumns"></tr> 
                 </table>
-                <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
+                <mat-paginator [length]="resultsLength" [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
             </div>
         </div>
     </div>

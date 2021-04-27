@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ACTION, EMPLOYEE_FORM_TEMPLATE } from '../../models/app.constraint';
-import { Employee, EmployeeForm } from '../../models/app.model';
+import { Employee, EmployeeForm, EmployeeFormGrouping } from '../../models/app.model';
 import { EmployeeService } from '../../services/employee.service';
 import { SnackbarService } from '../../services/snackbar.service';
 
@@ -19,9 +19,8 @@ export class AddUpdateEmployeeComponent implements OnInit, OnDestroy {
   param: Subscription
   hasUsername: boolean = false //flag to check for create/update
   username: string
-
-  employeeIndex: number
   currentEmployee: Employee
+  isInit: boolean = false
 
   constructor(private formBuilder: FormBuilder, 
     private router: Router, 
@@ -29,33 +28,16 @@ export class AddUpdateEmployeeComponent implements OnInit, OnDestroy {
     private snackBarService: SnackbarService,
     private employeeService: EmployeeService) {
 
-    // Initialize Template
-    this.employeeFormTemplate = new EmployeeForm()
-    this.employeeFormTemplate.title = "Employee Form"
-    EMPLOYEE_FORM_TEMPLATE.items.forEach((f, i) => {
-      // console.log(f)
-      this.employeeFormTemplate.items[i] = f
-      this.employeeFormTemplate.items[i].value = null
-    })
-
     this.param = this.activatedRoute.params.subscribe(data => {
       if(data['username']){
-        let param: string = data['username']
-
-        // [0] = index
-        // [1] = username
-        let params = param.split('/')
+        this.username = data['username']
         this.hasUsername = true
-
-        this.employeeIndex = parseInt(params[0], 10)
-        this.username = params[1]
       }
-      this.initializeForm()
     })
+    this.initializeForm()
   }
 
   ngOnInit(): void {
-
   }
 
   ngOnDestroy(){
@@ -63,17 +45,36 @@ export class AddUpdateEmployeeComponent implements OnInit, OnDestroy {
   }
 
   private initializeForm(){
-    if(this.username){
-      this.currentEmployee = this.employeeService.getEmployeeByUsername(this.username)
-
-      Object.keys(this.currentEmployee).forEach((key, value) => {
-        this.employeeFormTemplate.items[value].value = this.currentEmployee[key]
-      })
-    }
-
+    // Initialize reactive form    
     this.employeeForm = this.formBuilder.group({
       items: this.formBuilder.array([])
     })
+
+    this.employeeFormTemplate = new EmployeeForm()
+    this.employeeFormTemplate.title = EMPLOYEE_FORM_TEMPLATE.title
+
+    if(this.hasUsername){
+      this.employeeService.getEmployeeByUsername(this.username).subscribe(data => {
+        this.currentEmployee = data
+        // console.log(this.currentEmployee)
+
+        Object.keys(this.currentEmployee).forEach((key, value) => {
+          // console.log(key, value)
+          this.employeeFormTemplate.items[value] = EMPLOYEE_FORM_TEMPLATE.items[value]
+          this.employeeFormTemplate.items[value].value = this.currentEmployee[key]
+          // console.log(this.employeeFormTemplate.items[value].value, this.currentEmployee[key])
+          if(key === "birthDate"){
+            this.employeeFormTemplate.items[value].value = new Date(this.currentEmployee[key])
+          }
+        })
+      })
+    } else {
+      EMPLOYEE_FORM_TEMPLATE.items.forEach((item,i) => {
+        this.employeeFormTemplate.items[i] = item
+        this.employeeFormTemplate.items[i].value = null
+      })
+    }
+    this.isInit = true
   }
 
   returnFormControl($event: any){
@@ -94,14 +95,24 @@ export class AddUpdateEmployeeComponent implements OnInit, OnDestroy {
 
       Object.keys(newEmployee).forEach((key, index) => {
         newEmployee[key] = form.value.items[index]
+        // if(key === "birthDate") {
+        //   newEmployee[key] = new Date(form.value.items[index])
+        //   console.log(newEmployee[key])
+        // }
       })
   
       if(this.hasUsername){
         // Then update the existing employee
-        this.employeeService.updateEmployee(this.employeeIndex, newEmployee)
-        this.snackBarService.openFromComponent(this.currentEmployee, ACTION.EDIT)
+        this.employeeService.updateEmployee(this.username, newEmployee).subscribe(data => {
+          if(data){
+            // console.log(data)
+            this.snackBarService.openFromComponent(this.currentEmployee, ACTION.EDIT)
+          }
+        })
       } else {
-        this.employeeService.addEmployee(newEmployee)
+        this.employeeService.addEmployee(newEmployee).subscribe(data => {
+          console.log("new employee added", data)
+        })
       }
   
       setTimeout(() => {
@@ -110,3 +121,4 @@ export class AddUpdateEmployeeComponent implements OnInit, OnDestroy {
     }
   }
 }
+

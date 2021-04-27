@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -9,6 +9,7 @@ import { WarningComponent } from '../../dialogs/warning/warning.component';
 import { ACTION, DIALOG_DATA, KEY_EMPLOYEE_DATA, KEY_SEARCH_EMPLOYEE, SNACKBAR_DATA } from '../../models/app.constraint';
 import { Employee } from '../../models/app.model';
 import { EmployeeService } from '../../services/employee.service';
+import { SnackbarService } from '../../services/snackbar.service';
 
 const NAMES: string[] = [
   'Maia', 'Asher', 'Olivia', 'Atticus', 'Amelia', 'Jack', 'Charlotte', 'Theodore', 'Isla', 'Oliver',
@@ -26,6 +27,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   tableColumns: string[] = [];
   searchEmployeeName: string;
   employees: Employee[] = []
+  resultsLength: number = 0
 
   currentPageIndex: number;
   currentPageSize: number;
@@ -34,60 +36,71 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   constructor(private router: Router, 
     private employeeService: EmployeeService,
+    private snackbarService: SnackbarService,
     private dialog: MatDialog) { 
   }
 
   ngOnInit(): void {
-    this.employees = this.employeeService.getEmployees()
-    console.log(this.employees)
-    const keys = Object.keys(this.employeeService.getEmployees()[0])
+  }
 
-    // Exclude some columns to be viewed on table
-    keys.forEach((key, index) => {
-      if(key !== "email" && key !== "birthDate" && key !== "basicSalary" && key !== "description"){
-        this.tableColumns.push(key)
+  private fetchEmployees(){
+    this.employeeService.getEmployees().subscribe(data => {
+      this.employees = data
+      // console.log(this.employees)
+            
+      const keys = Object.keys(this.employees[0])
+
+      // Exclude some columns to be viewed on table
+      keys.forEach((key, index) => {
+        if(key !== "id" && key !== "email" && key !== "birthDate" && key !== "basicSalary" && key !== "description"){
+          this.tableColumns.push(key)
+        }
+      })
+
+      // Add actions column (view, edit, delete)
+      this.tableColumns.push("actions")
+
+      // Assign the data to the data source for the table to render
+      this.dataSource = new MatTableDataSource(this.employees);
+      // this.dataSource.data = this.employees
+      
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+
+      if(localStorage.getItem(KEY_SEARCH_EMPLOYEE)){
+        this.searchEmployeeName = localStorage.getItem(KEY_SEARCH_EMPLOYEE)
+        
+        this.onSearch()
       }
     })
+  }
 
-    // Add actions column (view, edit, delete)
-    this.tableColumns.push("actions")
-
-    // Assign the data to the data source for the table to render
-    this.dataSource = new MatTableDataSource(this.employees);
-    this.dataSource.data = this.employees
-
-    // Retrieve search keyword data after navigate back to this page
-    if(localStorage.getItem(KEY_SEARCH_EMPLOYEE)){
-      this.searchEmployeeName = localStorage.getItem(KEY_SEARCH_EMPLOYEE)
-      this.onSearch()
-    }
+  private refreshEmployees(){
+    this.employeeService.getEmployees().subscribe(data => {
+      this.dataSource.data = data
+    })
   }
 
   ngAfterViewInit(){
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    this.fetchEmployees()
   }
 
   onSearch(){
-    const employees = this.employeeService.getEmployees()
-
     if(this.searchEmployeeName){
-      localStorage.setItem(KEY_SEARCH_EMPLOYEE, this.searchEmployeeName)
       // Search Case = Filtering based on first name or last name with Fulltime status
-      const filteredEmployees = employees.filter(emp => {
+      const filteredEmployees = this.employees.filter(emp => {
         if((emp.firstName.toLowerCase().includes(this.searchEmployeeName.toLowerCase())
         || emp.lastName.toLowerCase().includes(this.searchEmployeeName.toLowerCase())) && emp.status == "Fulltime"){
           return emp
         }
       })
+      localStorage.setItem(KEY_SEARCH_EMPLOYEE, this.searchEmployeeName)
   
       this.dataSource.data = filteredEmployees
     } else {
       localStorage.removeItem(KEY_SEARCH_EMPLOYEE)
-      this.dataSource.data = employees
+      this.dataSource.data = this.employees
     }
-
-    console.log(this.dataSource.data)
   }
 
   onAddEmployee(){
@@ -95,17 +108,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   onSelectEmployee(username: string){
-    this.router.navigate(['/home', username])
+    this.router.navigate(['home', username])
   }
 
   onEditEmployee(username: string){
-    let i = this.employees.map((e, idx) => e.username).indexOf(username)
-
-    this.router.navigate(['add-update-employee', i+"/"+username])
+    this.router.navigate(['add-update-employee', username])
   }
 
   onDeleteEmployee(username: string){
-    let i = this.employees.map((e, idx) => e.username).indexOf(username)
+    let i = this.employees.map(e => e.username).indexOf(username)
 
     const dialogConfig = new MatDialogConfig()
     dialogConfig.width = "300px"
@@ -116,10 +127,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
     const dialogRef = this.dialog.open(WarningComponent, dialogConfig)
     dialogRef.afterClosed().subscribe(result => {
       if(result){
-        this.employeeService.deleteEmployee(i)
-
-        this.employees = this.employeeService.getEmployees()
-        this.dataSource.data = this.employees
+        this.employeeService.deleteEmployee(username).subscribe(res => {
+          this.refreshEmployees()
+          this.snackbarService.openFromComponent(this.employees[i], ACTION.DELETE)
+        })
       }
     })
   }

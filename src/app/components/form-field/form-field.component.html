@@ -6,13 +6,13 @@
     </mat-label>
     <ng-container [ngSwitch]="type">
         <ng-container *ngSwitchCase="'text'">
-            <input matInput [formControl]="formControl" type="text">
+            <input [id]="uid" matInput [formControl]="formControl" type="text">
         </ng-container>
         <ng-container *ngSwitchCase="'textarea'">
-            <textarea matInput [formControl]="formControl"></textarea>
+            <textarea [id]="uid" matInput [formControl]="formControl"></textarea>
         </ng-container>
         <ng-container *ngSwitchCase="'number'">
-            <input matInput [formControl]="formControl" type="number">
+            <input [id]="uid" matInput [formControl]="formControl" type="number">
         </ng-container>
         <!-- <ng-container *ngSwitchCase="'datepicker'">
             <input 
@@ -25,7 +25,9 @@
             <mat-datepicker #picker></mat-datepicker>
         </ng-container> -->
         <ng-container *ngSwitchCase="'autocomplete'">
-            <input type="text"
+            <input
+                [id]="uid" 
+                type="text"
                 placeholder="Pick one"
                 matInput
                 [formControl]="formControl"
@@ -39,7 +41,7 @@
             </mat-autocomplete>
         </ng-container>
         <ng-container *ngSwitchCase="'select'">
-            <mat-select [formControl]="formControl">
+            <mat-select [id]="uid" [formControl]="formControl">
                 <mat-option 
                     *ngFor="let option of options"
                     [value]="option">
@@ -55,6 +57,7 @@
         <span *ngIf="isRequired" class="text-warning">*</span>
     </mat-label>
     <input 
+        [id]="uid"
         matInput 
         [max]="maxDate"
         [matDatepicker]="picker"
@@ -72,3 +75,4 @@
 <mat-error *ngIf="formControl.errors?.matDatepickerMax">
     {{ label }} should be inferior.
 </mat-error>
+

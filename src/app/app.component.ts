@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
-import { Employees, KEY_EMPLOYEE_DATA } from './models/app.constraint';
+// import { Employees, KEY_EMPLOYEE_DATA } from './models/app.constraint';
 import { AuthService } from './services/auth.service';
 import { EmployeeService } from './services/employee.service';
 
@@ -18,9 +18,9 @@ export class AppComponent {
   constructor(private employeeService: EmployeeService,
     private authService: AuthService){
 
-    if(!this.employeeService.getEmployees()){
-      this.employeeService.storeAllEmployees(Employees)
-    }
+    // if(!this.employeeService.getEmployees()){
+    //   this.employeeService.storeAllEmployees(Employees)
+    // }
   }
 
   toggleSidenav($event){

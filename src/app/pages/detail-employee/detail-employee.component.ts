@@ -20,10 +20,10 @@ export class DetailEmployeeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Retrieve username param to fetch detail
+    // Retrieve id param to fetch detail
     this.param = this.route.params.subscribe(data => {
       if(data['username']){
-        // Fetch employee detail by username
+        // Fetch employee detail by id
         this.getEmployeeDetail(data['username'])
       }
     })
@@ -34,22 +34,22 @@ export class DetailEmployeeComponent implements OnInit, OnDestroy {
   }
 
   private getEmployeeDetail(username: string){
-    const employee = this.employeeService.getEmployeeByUsername(username)
-    
-    this.employee = new EmployeeForm()
-    this.employee.title = "Employee Detail"
-    this.employee.items = []
-
-    // Iterate through employee properties and assign to employee model
-    Object.entries(employee).forEach((key, value) => {
-      let item = new EmployeeFormGrouping()
-      item.label = key[0]
-      item.value = key[1]
-
-      this.employee.items.push(item)
+    const employee = this.employeeService.getEmployeeByUsername(username).subscribe(data => {
+      this.employee = new EmployeeForm()
+      this.employee.title = "Employee Detail"
+      this.employee.items = []
+  
+      // Iterate through employee properties and assign to employee model
+      Object.entries(data).forEach((key, value) => {
+        let item = new EmployeeFormGrouping()
+        item.label = key[0]
+        item.value = key[1]
+  
+        this.employee.items.push(item)
+      })
+  
+      // console.log(this.employee)
     })
-
-    console.log(this.employee)
   }
 
   onGoBack(){

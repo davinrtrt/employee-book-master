@@ -1,22 +1,26 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-8 col-sm-12 mx-auto">
-            <div class="form-content">
+            <div *ngIf="employeeFormTemplate" class="form-content">
                 <h3>{{ employeeFormTemplate.title }}</h3>
                 <p class="text-warning">*<span> Required</span></p>
                 <form [formGroup]="employeeForm">
-                    <ng-container *ngFor="let item of this.employeeFormTemplate.items">
-                        <div class="form-group">
-                            <form-field
-                                [uid]="item.uid"
-                                [label]="item.label"
-                                [type]="item.type"
-                                [isRequired]="item.isRequired"
-                                [options]="item.options"
-                                [value]="item.value"
-                                (returnFormControl)="returnFormControl($event)">
-                            </form-field>
-                        </div>
+                    <ng-container *ngIf="isInit">
+                        <!-- {{ this.employeeFormTemplate | json }} -->
+                        <ng-container *ngFor="let item of this.employeeFormTemplate.items">
+                            <div class="form-group">
+                                <!-- <div>{{ item.value }}</div> -->
+                                <form-field
+                                    [uid]="item.uid"
+                                    [label]="item.label"
+                                    [type]="item.type"
+                                    [isRequired]="item.isRequired"
+                                    [options]="item.options"
+                                    [value]="item.value"
+                                    (returnFormControl)="returnFormControl($event)">
+                                </form-field>
+                            </div>
+                        </ng-container>
                     </ng-container>
                     <div class="text-right">
                         <button (click)="onCancel()" mat-flat-button color="warn" style="margin-right: 1rem;">CANCEL</button>
